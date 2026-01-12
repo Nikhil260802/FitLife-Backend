@@ -10,5 +10,5 @@ out/
 *.log
 
 # IntelliJ IDEA files
-.idea/
+/.idea/
 *.iml
