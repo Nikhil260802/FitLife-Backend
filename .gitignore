@@ -1,0 +1,14 @@
+# Environment variables (SECRETS)
+.env
+application-prod.properties
+
+# Build files
+target/
+out/
+
+# Logs
+*.log
+
+# IntelliJ IDEA files
+.idea/
+*.iml
