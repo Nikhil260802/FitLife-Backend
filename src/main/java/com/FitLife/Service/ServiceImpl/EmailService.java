@@ -1,28 +1,63 @@
 package com.FitLife.Service.ServiceImpl;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    @Value("${brevo.api.key}")
+    private String apiKey;
 
-    public void sendMail(String to, String subject, String body) {
+    @Value("${brevo.sender.email}")
+    private String senderEmail;
+
+    @Value("${brevo.sender.name}")
+    private String senderName;
+
+    private static final String BREVO_URL =
+            "https://api.brevo.com/v3/smtp/email";
+
+    public void sendEmail(String to, String subject, String htmlContent) {
+
         try {
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(body, true);
-            javaMailSender.send(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            RestTemplate restTemplate = new RestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("api-key", apiKey);
+
+            Map<String, Object> body = new HashMap<>();
+
+            body.put("sender", Map.of(
+                    "email", senderEmail,
+                    "name", senderName
+            ));
+
+            body.put("to", List.of(
+                    Map.of("email", to)
+            ));
+
+            body.put("subject", subject);
+            body.put("htmlContent", htmlContent);
+
+            HttpEntity<Map<String, Object>> request =
+                    new HttpEntity<>(body, headers);
+
+            restTemplate.postForEntity(
+                    BREVO_URL,
+                    request,
+                    String.class
+            );
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -53,15 +88,8 @@ public class EmailService {
 
 
         try {
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(emailBody, true);
-
-            javaMailSender.send(message);
-        } catch (MessagingException e) {
+            sendEmail(to, subject, emailBody);
+        } catch (RuntimeException e) {
             throw new RuntimeException("Failed to send email", e);
         }
     }

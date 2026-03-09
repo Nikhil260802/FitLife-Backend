@@ -152,7 +152,7 @@ public class EnrollmentDetailsServiceImpl implements EnrollmentDetailsService {
                     String subject = "Reminder: Your Scheduled FitLife Session";
                     String body = String.format("Hello %s,\nYour session is scheduled at %s. Please join on time.",
                             user.getUserName(), timeSlot.toString());
-                    emailService.sendMail(email, subject, body);
+                    emailService.sendEmail(email, subject, body);
                 }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);

@@ -149,7 +149,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             enrollment.setStatus(EnrollmentDetails.Status.ACTIVE);
             enrollmentRepo.save(enrollment);
 
-            emailService.sendMail(user.getEmail(),
+            emailService.sendEmail(user.getEmail(),
                     "Payment Successful",
                     "Your payment was successful and you are enrolled in " + course.getCourseName());
 

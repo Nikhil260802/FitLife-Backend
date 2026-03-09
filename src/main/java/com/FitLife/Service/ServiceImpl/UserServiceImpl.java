@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
     private void sendVerificationOtp(String email, String otp) {
         String subject = "Email Verification";
         String body = "Your verification otp is " + otp;
-        emailService.sendMail(email, subject, body);
+        emailService.sendEmail(email, subject, body);
     }
 
     @Override
