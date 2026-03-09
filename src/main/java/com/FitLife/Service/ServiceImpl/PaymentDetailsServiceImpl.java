@@ -72,10 +72,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             Course course = courseRepository.findById(courseId)
                     .orElseThrow(() -> new RuntimeException("Course not found"));
 
-            RazorpayClient razorpay = new RazorpayClient(
-                    razorpayKey,
-                    razorpaySecret
-            );
+            RazorpayClient razorpay = new RazorpayClient(razorpayKey, razorpaySecret);
 
             JSONObject options = new JSONObject();
             options.put("amount", course.getPrice() * 100);
@@ -98,6 +95,38 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
                     .body("Error creating Razorpay Order: " + e.getMessage());
         }
     }
+
+//    public ResponseEntity<?> createOrder(String email, int courseId) {
+//        try {
+//            Course course = courseRepository.findById(courseId)
+//                    .orElseThrow(() -> new RuntimeException("Course not found"));
+//
+//            RazorpayClient razorpay = new RazorpayClient(razorpayKey, razorpaySecret);
+//
+//            JSONObject options = new JSONObject();
+//            // Razorpay expects amount in paise
+//            options.put("amount", course.getPrice() * 100);
+//            options.put("currency", "INR");
+//            options.put("receipt", "rcpt_" + System.currentTimeMillis());
+//            options.put("payment_capture", 1);
+//
+//            Order order = razorpay.orders.create(options);
+//
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("id", order.get("id"));            // order id
+//            response.put("amount", order.get("amount"));    // amount in paise
+//            response.put("currency", order.get("currency"));
+//            response.put("courseId", courseId);
+//            response.put("email", email);
+//            response.put("razorpayKey", razorpayKey);       // public key for frontend
+//
+//            return ResponseEntity.ok(response);
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Map.of("status", "FAILED", "message", e.getMessage()));
+//        }
+//    }
 
     @Override
     @Transactional
@@ -176,9 +205,7 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
             options.put("razorpay_payment_id", paymentId);
             options.put("razorpay_signature", razorpaySignature);
 
-            String secret = "tLN54VVr9NHqZthfRSQfAYLJ";
-
-            return Utils.verifyPaymentSignature(options, secret);
+            return Utils.verifyPaymentSignature(options, razorpaySecret);
 
         } catch (Exception e) {
             e.printStackTrace();
