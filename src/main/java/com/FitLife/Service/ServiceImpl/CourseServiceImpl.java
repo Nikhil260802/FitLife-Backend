@@ -96,7 +96,7 @@ public class CourseServiceImpl implements CourseService {
             Path target = uploadPath.resolve(filename);
             Files.copy(image.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
 
-            newCourse.setImagePath(uploadDir + filename);
+            newCourse.setImagePath(uploadDir +"/"+ filename);
 
             courseRepository.save(newCourse);
             return true;
